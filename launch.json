@@ -1,0 +1,24 @@
+{
+  "kind": "custom_token",
+  "token": {
+    "contract": "SwarmMade",
+    "name": "Swarm Made",
+    "symbol": "MADE",
+    "decimals": 18,
+    "constructorArgs": [],
+    "totalSupply": "1000000000000000000000000000"
+  },
+  "contracts": [],
+  "pool": {
+    "pairedCurrency": "0xd34a99bc0f67ae1bbd63c660e6d0b0dd03e263b7",
+    "fee": 3000,
+    "tickSpacing": 60,
+    "initialPrice": "125270724187523965593206901"
+  },
+  "economics": {
+    "poolBps": 8800,
+    "initialMarketCapWei": "2500000000000000000000",
+    "remainderTo": "0x1846927b920fa2d41766ed4f88f1d10e640f1590"
+  },
+  "notes": "Swarm Made (MADE) is a plain fixed-supply community token: src/SwarmMade.sol, OpenZeppelin v5 ERC20 (vendored as ordinary files under lib/openzeppelin-contracts) with nothing added. The constructor takes no arguments (constructorArgs is empty) and mints TOTAL_SUPPLY = 1,000,000,000 * 10^18 = 1000000000000000000000000000 minor units once to msg.sender, which under ProjectFactory.launchCustom is the factory; token.totalSupply states exactly that amount and decimals() returns 18. There is no owner, minter, pauser, blocklist, fee, burn hook, receive/fallback or upgrade path, so the supply can never grow after launch and nobody but a holder (or an approved spender) can move a holder's balance. Every transfer moves exactly the amount requested, so the factory's transfer to the MerkleDistributor, the single-sided pool seed through the Uniswap v4 PoolManager, the forwarding of the remainder, distributor claims and trader swaps all arrive whole; no $factory, $poolManager or $launchNumber exemptions are needed. No application contracts accompany the token (contracts is empty) and there are no initialization calls. Economics are the requester's job values copied verbatim: 8800 bps of the whole supply (880,000,000 MADE) seeds the pool at an opening market cap of 2,500 IMD (2500000000000000000000 minor units of the pair token, assumed 18 decimals), and the rest of the requester's share after the swarm's share is forwarded to remainderTo. The swarm's share is taken by the factory by construction and is not written here. pool.pairedCurrency is the chain's IMD pair token named by the request, not ETH; fee 3000 (0.3%) with tickSpacing 60 is the launch policy's standard tier for that fee. pool.initialPrice is provenance only: it is the sqrtPriceX96 of initialMarketCapWei / totalSupply = 2.5e-6 IMD per MADE, computed as sqrt(2.5e-6) * 2^96 for the ordering in which MADE is currency0 and IMD is currency1 (the deployed token address is below 0xd34a...); if CREATE2 places the token above the pair token the inverse ordering gives 50108289675009586237282760313921. The deployer derives the actual opening price from economics.initialMarketCapWei and token.totalSupply. Build: solc 0.8.26, cancun, optimizer 200 runs, bytecode_hash none, cbor_metadata false, no ffi, no fs permissions. The accepted tree's own suite (36 tests, test/SwarmMade.t.sol and test/DeploySwarmMade.t.sol) rehearses the launch flows, the supply floor, the privileged-call list and the DELEGATECALL/CALLCODE/SELFDESTRUCT scan; passing tests are not an audit and independent review is still required before admission."
+}
